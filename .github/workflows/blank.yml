@@ -52,3 +52,9 @@ jobs:
           python app.py --version green --puerto 8001 > green.log 2>&1 &
           echo $! > green.pid
           sleep 2
+
+      - name: Probar version Green
+        run: |
+          respuesta=$(curl --fail --silent --show-error http://127.0.0.1:8001/health)
+          echo "$respuesta"
+          test "$respuesta" = "OK - Version green"
