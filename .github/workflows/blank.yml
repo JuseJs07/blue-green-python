@@ -72,3 +72,18 @@ jobs:
           respuesta=$(curl --fail --silent --show-error "http://127.0.0.1:$puerto/health")
           echo "$respuesta"
           test "$respuesta" = "OK - Version green"
+
+      - name: Finalizar servidores
+        if: always()
+        run: |
+          for archivo in blue.pid green.pid; do
+            if [ -f "$archivo" ]; then
+              pid=$(cat "$archivo")
+              if kill -0 "$pid" 2>/dev/null; then
+                kill "$pid"
+                echo "Servidor de $archivo detenido"
+              else
+                echo "El servidor de $archivo ya estaba detenido"
+              fi
+            fi
+          done
