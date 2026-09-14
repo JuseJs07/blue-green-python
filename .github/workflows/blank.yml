@@ -10,9 +10,10 @@ jobs:
   ci:
     name: Integración Continua
     runs-on: ubuntu-latest
+
     steps:
-      - name: Descargar el codigo
-        uses: actions/checkout@v4 
+      - name: Descargar codigo
+        uses: actions/checkout@v4
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -21,7 +22,33 @@ jobs:
 
       - name: Validar sintaxis de Python
         run: python -m py_compile app.py
-            
-      - name: Ejecutatr pruebas basicas
+
+      - name: Ejecutar prueba basica
         run: |
-          python -c "from app import crear_servidor; print('Codigo Valido')"
+          python -c "from app import crear_servidor; print('Codigo valido')"
+
+  cd:
+    name: Despliegue Blue-Green
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Iniciar version Blue
+        run: |
+          python app.py --version blue --puerto 8000 > blue.log 2>&1 &
+          echo $! > blue.pid
+          sleep 2
+
+      - name: Iniciar version Green
+        run: |
+          python app.py --version green --puerto 8001 > green.log 2>&1 &
+          echo $! > green.pid
+          sleep 2
