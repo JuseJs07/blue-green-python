@@ -46,6 +46,7 @@ jobs:
           python app.py --version blue --puerto 8000 > blue.log 2>&1 &
           echo $! > blue.pid
           sleep 2
+          echo "8000" > puerto_activo.txt
 
       - name: Iniciar version Green
         run: |
@@ -58,3 +59,8 @@ jobs:
           respuesta=$(curl --fail --silent --show-error http://127.0.0.1:8001/health)
           echo "$respuesta"
           test "$respuesta" = "OK - Version green"
+
+      - name: Cambiar trafico de Blue a Green
+        run: |
+          echo "8001" > puerto_activo.txt
+          echo "Version activa cambiada a Green en el puerto 8001"
