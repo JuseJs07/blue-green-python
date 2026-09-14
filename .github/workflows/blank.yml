@@ -64,3 +64,11 @@ jobs:
         run: |
           echo "8001" > puerto_activo.txt
           echo "Version activa cambiada a Green en el puerto 8001"
+
+      - name: Verificar version activa
+        run: |
+          puerto=$(cat puerto_activo.txt)
+          echo "Consultando puerto activo: $puerto"
+          respuesta=$(curl --fail --silent --show-error "http://127.0.0.1:$puerto/health")
+          echo "$respuesta"
+          test "$respuesta" = "OK - Version green"
